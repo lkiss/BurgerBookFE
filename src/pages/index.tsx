@@ -1,14 +1,21 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import useSWR from 'swr'
-import { fetcher } from '@/swr/fetcher'
-
-const inter = Inter({ subsets: ['latin'] })
+import { useEffect, useState } from 'react'
+import { BurgerPlace } from '@/models/burger-place'
+import BurgerMap from './burgermap'
 
 export default function Home() {
-  const { data, error, isLoading } = useSWR('https://burgerbookbe.azurewebsites.net/api/BurgerPlace', fetcher)
+  const [burgerPlace, setBurgerPlace] = useState<BurgerPlace | null>(null)
+ 
+  // fetch data
+  useEffect(() => {
+    fetch('https://burgerbookbe.azurewebsites.net/api/BurgerPlace')
+      .then(res => res.json())
+      .then( (data: BurgerPlace) => {
+        setBurgerPlace(data);
+        console.log(data);
+      })
+  }, []);
 
   return (
     <>
@@ -19,7 +26,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div>{data}</div>
+        <BurgerMap></BurgerMap>
       </main>
     </>
   )
