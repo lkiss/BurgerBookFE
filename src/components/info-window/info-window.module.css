@@ -1,0 +1,12 @@
+.info_window {
+    
+}
+
+.info_window_content {
+    display: flex;
+    flex-direction: column;
+}
+
+.info_window_content_button {
+    align-self: center;
+}

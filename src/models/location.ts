@@ -1,4 +1,4 @@
 export interface Location {
-    longitude: number;
-    altidute: number;
+    lat: number;
+    lng: number;
 }

@@ -3,18 +3,21 @@ import styles from '@/styles/Home.module.css'
 import { useEffect, useState } from 'react'
 import { BurgerPlace } from '@/models/burger-place'
 import BurgerMap from './burgermap'
+import Script from 'next/script'
+import TemporaryDrawer from '@/components/temporary-drawer/temporary-drawer'
 
 export default function Home() {
-  const [burgerPlace, setBurgerPlace] = useState<BurgerPlace | null>(null)
+  const [burgerPlaces, setBurgerPlaces] = useState<BurgerPlace[]>([]);
+  const [toggledBurgerPlace, setToggleDrawer] = useState(null);
  
   // fetch data
   useEffect(() => {
-    fetch('https://burgerbookbe.azurewebsites.net/api/BurgerPlace')
-      .then(res => res.json())
-      .then( (data: BurgerPlace) => {
-        setBurgerPlace(data);
-        console.log(data);
-      })
+    const fetchBurgerPlaces = async ()=> {
+      const response = await fetch('https://burgerbookbe.azurewebsites.net/api/BurgerPlace');
+      const burgerPlaces = await response.json();
+      setBurgerPlaces(burgerPlaces)
+    }
+    fetchBurgerPlaces();
   }, []);
 
   return (
@@ -26,7 +29,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <BurgerMap></BurgerMap>
+        <BurgerMap toggleDrawerWithBurgerPlace={setToggleDrawer} burgerPlaces={burgerPlaces}></BurgerMap>
+        <TemporaryDrawer toggledBurgerPlace={toggledBurgerPlace}></TemporaryDrawer>
       </main>
     </>
   )
