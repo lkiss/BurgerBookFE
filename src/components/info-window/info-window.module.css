@@ -5,6 +5,7 @@
 .info_window_content {
     display: flex;
     flex-direction: column;
+    color: black;
 }
 
 .info_window_content_button {
