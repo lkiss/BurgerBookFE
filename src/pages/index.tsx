@@ -3,17 +3,17 @@ import styles from '@/styles/Home.module.css'
 import { useEffect, useState } from 'react'
 import { BurgerPlace } from '@/models/burger-place'
 import BurgerMap from './burgermap'
-import Script from 'next/script'
 import TemporaryDrawer from '@/components/temporary-drawer/temporary-drawer'
+import { API_HOST } from '@/constants'
 
 export default function Home() {
-  const [burgerPlaces, setBurgerPlaces] = useState<BurgerPlace[]>([]);
-  const [toggledBurgerPlace, setToggleDrawer] = useState(null);
+  const [burgerPlaces, setBurgerPlaces] = useState<BurgerPlace[] | null>(null);
+  const [toggledBurgerPlace, setToggleDrawer] = useState<BurgerPlace | null>(null);
  
   // fetch data
   useEffect(() => {
     const fetchBurgerPlaces = async ()=> {
-      const response = await fetch('https://burgerbookbe.azurewebsites.net/api/BurgerPlace');
+      const response = await fetch(`${API_HOST}/BurgerPlace`);
       const burgerPlaces = await response.json();
       setBurgerPlaces(burgerPlaces)
     }
@@ -30,7 +30,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <BurgerMap toggleDrawerWithBurgerPlace={setToggleDrawer} burgerPlaces={burgerPlaces}></BurgerMap>
-        <TemporaryDrawer toggledBurgerPlace={toggledBurgerPlace}></TemporaryDrawer>
+        <TemporaryDrawer burgerPlace={toggledBurgerPlace}></TemporaryDrawer>
       </main>
     </>
   )

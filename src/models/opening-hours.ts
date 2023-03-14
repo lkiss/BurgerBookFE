@@ -1,4 +1,4 @@
 export interface OpeningHours {
-    startTime: Date;
-    endTime: Date;
+    startTime: string;
+    endTime: string;
 }

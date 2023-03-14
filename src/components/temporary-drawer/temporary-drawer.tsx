@@ -2,45 +2,28 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import { useEffect, useState } from 'react';
-import { BurgerReview } from '@/models/burger-review';
-import { IconButton, Rating, TextField, Typography } from '@mui/material';
-import { BurgerPlace } from '@/models/burger-place';
-import { PhotoCamera } from '@mui/icons-material';
 import OpeningHours from '../opening-hours/opening-hours';
 import AddReview from '../add-review/add-review';
+import BurgerMenu from '../burger-menu/burger-menu';
+import BurgerReviews from '../burger-reviews/burger-reviews';
+import { BurgerPlace } from '@/models/burger-place';
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
-export default function TemporaryDrawer(props: any) {
-    const burgerPlace = props.toggledBurgerPlace;
+type Props = {
+    burgerPlace: BurgerPlace | null
+}
 
+export default function TemporaryDrawer({ burgerPlace }: Props) {
     const [drawerState, setDrawerToggle] = useState({ left: false });
-    const [burgerReviews, setBurgerReviews] = useState([]);
 
     useEffect(() => {
-        const fetchBurgerReviews = async () => {
-            const response = await fetch('https://burgerbookbe.azurewebsites.net/api/BurgerReview/getbyburgerplaceid/' + burgerPlace.id);
-            const burgerReviews = await response.json();
-            setBurgerReviews(burgerReviews);
-        }
-
         if (burgerPlace) {
-            fetchBurgerReviews();
             setDrawerToggle({ ...StaticRange, ["left"]: true });
         }
-
     }, [burgerPlace]);
-
-    let newBurgerRewiew: BurgerReview = {} as BurgerReview;
 
     const toggleDrawer =
         (anchor: Anchor, open: boolean) =>
@@ -52,49 +35,28 @@ export default function TemporaryDrawer(props: any) {
                 ) {
                     return;
                 }
-
                 setDrawerToggle({ ...drawerState, [anchor]: open });
             };
 
-    
-
     const list = (anchor: Anchor) => (
         <Box
-            sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
+            sx={{ width: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             role="presentation"
         >
             {burgerPlace ?
                 <>
                     <h3>{burgerPlace.name}</h3>
-                    <h4>Opening hours</h4>
-                    {burgerPlace
-                        ? <OpeningHours burgerPlace={burgerPlace} setDrawerToggle={setDrawerToggle}></OpeningHours>
-                        : <div>Loading...</div>
-                    }
-                    <Divider />
-                    {burgerReviews.map((burgerReview: BurgerReview) => {
-                        return
-                        <>
-                            <img src={burgerReview.pictureUrl} width="50" height="50"></img>
-                            <Typography component="legend">Overall</Typography>
-                            <Rating name="read-only" value={burgerReview.overallRating} readOnly />
-
-                            <Typography component="legend">Texture</Typography>
-                            <Rating name="read-only" value={burgerReview.textureRating} readOnly />
-
-                            <Typography component="legend">Taste</Typography>
-                            <Rating name="read-only" value={burgerReview.tasteRating} readOnly />
-
-                            <Typography component="legend">Visual</Typography>
-                            <Rating name="read-only" value={burgerReview.visualRating} readOnly />
-                            <span>{burgerReview.comment}</span>
-                        </>
-                    })}
-                    <Divider />
-                    <AddReview newBurgerRewiew={newBurgerRewiew}></AddReview>
-                    <Divider/>
-
-                    <Button size="small" variant="outlined" onClick={() => setDrawerToggle({ left: false })}>Close</Button>
+                    <>
+                        <OpeningHours burgerPlace={burgerPlace}></OpeningHours>
+                        <Divider />
+                        <BurgerMenu burgerPlace={burgerPlace}></BurgerMenu>
+                        <Divider />
+                        <BurgerReviews burgerPlace={burgerPlace}></BurgerReviews>
+                        <Divider />
+                        <AddReview burgerPlace={burgerPlace}></AddReview>
+                        <Divider />
+                        <Button size="small" variant="outlined" onClick={() => setDrawerToggle({ left: false })}>Close</Button>
+                    </>
                 </>
                 : <div>Loading...</div>
             }
@@ -105,7 +67,6 @@ export default function TemporaryDrawer(props: any) {
         <div>
             {(['left'] as const).map((anchor) => (
                 <React.Fragment key={anchor}>
-                    {/* <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button> */}
                     <Drawer
                         anchor={anchor}
                         open={drawerState[anchor]}
