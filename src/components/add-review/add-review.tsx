@@ -1,12 +1,17 @@
 import { API_HOST } from '@/constants';
 import { BurgerPlace } from '@/models/burger-place';
 import { BurgerReview } from '@/models/burger-review';
+import { BurgerReviewImageResponse } from '@/models/burger-review-image-response';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Button, FormControl, Rating, TextField, Typography } from '@mui/material';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Rating, TextField, Typography } from '@mui/material';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react';
+import Resizer from "react-image-file-resizer";
 
 type Props = {
     burgerPlace: BurgerPlace;
+    burgerReviewResponse: BurgerReview;
+    setNewBurgerReviewImage: Dispatch<SetStateAction<BurgerReviewImageResponse>>;
+    setBurgerReviewResponse: Dispatch<SetStateAction<BurgerReview>>;
 }
 
 const initialBurgerReview: BurgerReview = {
@@ -20,30 +25,31 @@ const initialBurgerReview: BurgerReview = {
     pictureUrl: ""
 };
 
-export default function AddReview({ burgerPlace }: Props) {
-    const [newBurgerReview, setBurgerReview] = useState<BurgerReview>(initialBurgerReview);
+export default function AddReview({ burgerPlace, burgerReviewResponse, setNewBurgerReviewImage, setBurgerReviewResponse }: Props) {
     const [imagePreview, setImagePreview] = useState<string>("");
+    const [newBurgerReview, setNewBurgerReview] = useState<BurgerReview>(initialBurgerReview);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     useEffect(() => {
         const postBurgerReview = async () => {
-            const response = await fetch(
-                `${API_HOST}/BurgerReview`,
-                { method: "POST", body: JSON.stringify(newBurgerReview), headers: { "content-type": "application/json" } });
-            const burgerReviewResponse = await response.json();
-            setBurgerReview({ ...newBurgerReview, id: burgerReviewResponse.id });
+            if (newBurgerReview.burgerPlaceId) {
+                const response = await fetch(
+                    `${API_HOST}/BurgerReview`,
+                    { method: "POST", body: JSON.stringify(newBurgerReview), headers: { "content-type": "application/json" } });
+                const burgerReviewResponse = await response.json();
+
+                setBurgerReviewResponse(burgerReviewResponse);
+            }
         };
 
-        if (newBurgerReview.burgerPlaceId) {
-            postBurgerReview();
-        }
+        postBurgerReview();
 
-    }, [newBurgerReview.burgerPlaceId]);
+    }, [newBurgerReview.burgerPlaceId, newBurgerReview.id]);
 
     useEffect(() => {
         const postBurgerReviewImage = async () => {
-            if (imageFile?.size) {
-                const queryParams = new URLSearchParams({ "reviewId": newBurgerReview.id, "placeId": newBurgerReview.burgerPlaceId });
+            if (burgerReviewResponse.id && imageFile?.size) {
+                const queryParams = new URLSearchParams({ "burgerReviewId": burgerReviewResponse.id, "burgerPlaceId": burgerReviewResponse.burgerPlaceId });
                 const endpoint = `${API_HOST}/BurgerReview/uploadreviewimage`;
                 const imageFormData = new FormData();
                 imageFormData.append("file", imageFile);
@@ -57,28 +63,52 @@ export default function AddReview({ burgerPlace }: Props) {
                                 'content-length': `${imageFile.size}`
                             }
                         });
-                const burgerImageUpladResponse = await response.json();
-                return burgerImageUpladResponse;
+                const burgerImageUpladResponse: BurgerReviewImageResponse = await response.json();
+                setNewBurgerReview(initialBurgerReview);
+                setImagePreview("");
+                setImageFile(null);
+                setNewBurgerReviewImage(burgerImageUpladResponse);
+                imageFormData.delete("file");
+            }
+            else {
+                setNewBurgerReview(initialBurgerReview);
+                setNewBurgerReviewImage({} as BurgerReviewImageResponse);
             }
         }
 
-        if (newBurgerReview.id) {
-            postBurgerReviewImage();
-        }
+        postBurgerReviewImage();
 
-    }, [newBurgerReview.id]);
+    }, [burgerReviewResponse.id]);
+
+    const resizeImage = (file: File) => new Promise<File>((resolve) => {
+        Resizer.imageFileResizer(
+            file,
+            100,
+            100,
+            "WEBP",
+            100,
+            0,
+            (uri) => {
+                resolve(uri as File);
+            },
+            "file"
+        );
+    });
 
     const handleAddReview = () => {
-        setBurgerReview({ ...newBurgerReview, burgerPlaceId: burgerPlace.id, pictureUrl: "true" });
+        imageFile?.size
+            ? setNewBurgerReview({ ...newBurgerReview, burgerPlaceId: burgerPlace.id, pictureUrl: imageFile.type })
+            : setNewBurgerReview({ ...newBurgerReview, burgerPlaceId: burgerPlace.id })
     }
 
-    const handleImage = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleImage = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.value) {
             const imageFile = event.target.files[0];
             const imageObjectUrl = URL.createObjectURL(imageFile);
+            const resizedFile = await resizeImage(imageFile);
 
             setImagePreview(imageObjectUrl);
-            setImageFile(imageFile);
+            setImageFile(resizedFile);
         }
     }
 
@@ -100,7 +130,7 @@ export default function AddReview({ burgerPlace }: Props) {
                         name="simple-controlled"
                         value={newBurgerReview.textureRating}
                         onChange={(event, newValue) => {
-                            setBurgerReview({ ...newBurgerReview, textureRating: newValue || 0 });
+                            setNewBurgerReview({ ...newBurgerReview, textureRating: newValue || 0 });
                         }}
                     />
                     <Typography component="legend">Taste</Typography>
@@ -108,7 +138,7 @@ export default function AddReview({ burgerPlace }: Props) {
                         name="simple-controlled"
                         value={newBurgerReview.tasteRating}
                         onChange={(event, newValue) => {
-                            setBurgerReview({ ...newBurgerReview, tasteRating: newValue || 0 });
+                            setNewBurgerReview({ ...newBurgerReview, tasteRating: newValue || 0 });
                         }}
                     />
                     <Typography component="legend">Visual</Typography>
@@ -116,14 +146,14 @@ export default function AddReview({ burgerPlace }: Props) {
                         name="simple-controlled"
                         value={newBurgerReview.visualRating}
                         onChange={(event, newValue) => {
-                            setBurgerReview({ ...newBurgerReview, visualRating: newValue || 0 });
+                            setNewBurgerReview({ ...newBurgerReview, visualRating: newValue || 0 });
                         }}
                     />
                     <Typography component="legend">Comment</Typography>
-                    <TextField fullWidth={true} id="outlined-controlled" variant="outlined" onChange={(event) => setBurgerReview({ ...newBurgerReview, comment: event.target.value })} />
+                    <TextField fullWidth={true} id="outlined-controlled" variant="outlined" value={newBurgerReview.comment} onChange={(event) => setNewBurgerReview({ ...newBurgerReview, comment: event.target.value })} />
                     <Button sx={{ alignSelf: 'stretch', marginTop: '10px' }} variant="contained" component="label">
                         Upload Image
-                        <input hidden accept="image/jpeg" multiple type="file" onChange={handleImage} />
+                        <input hidden accept="image/*" multiple type="file" onChange={handleImage} />
                     </Button>
                     <Button
                         size="small"

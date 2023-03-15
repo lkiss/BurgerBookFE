@@ -12,12 +12,11 @@ type Props = {
 export default function BurgerMap({ burgerPlaces, toggleDrawerWithBurgerPlace }: Props) {
     const center = useMemo(() => ({ lat: 47.483809, lng: 18.825881 }), []);
 
-    console.log("BurgerMap", burgerPlaces);
-
     return (
         <>
             <LoadScript
                 googleMapsApiKey="AIzaSyCaXYS7jSFYyhj6B_0qaBU3M5m-2MgzgJU"
+                
             >
                 <GoogleMap
                     mapContainerClassName={styles.container}
@@ -28,7 +27,6 @@ export default function BurgerMap({ burgerPlaces, toggleDrawerWithBurgerPlace }:
                         burgerPlaces
                             ?.map((burgerPlace: BurgerPlace) => (<InfoWindow key={burgerPlace.id} burgerPlace={burgerPlace} toggleDrawerWithBurgerPlace={toggleDrawerWithBurgerPlace}></InfoWindow>))
                     }
-
                     <></>
                 </GoogleMap>
             </LoadScript>

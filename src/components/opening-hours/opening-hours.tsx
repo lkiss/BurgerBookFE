@@ -26,25 +26,25 @@ export default function OpeningHours({ burgerPlace }: Props) {
                     <nav aria-label="Monday Tuesday Wednesday Thursday Friday Saturday Sunday">
                         <List>
                             <ListItem disablePadding>
-                                <ListItemText primary="Monday" secondary={convertOpeningHours(burgerPlace.openingHours.Monday)} />
+                                <ListItemText role="listitem" primary="Monday" secondary={convertOpeningHours(burgerPlace.openingHours.Monday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Tuesday" secondary={convertOpeningHours(burgerPlace.openingHours.Tuesday)} />
+                                <ListItemText role="listitem" primary="Tuesday" secondary={convertOpeningHours(burgerPlace.openingHours.Tuesday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Wednesday" secondary={convertOpeningHours(burgerPlace.openingHours.Wednesday)} />
+                                <ListItemText role="listitem" primary="Wednesday" secondary={convertOpeningHours(burgerPlace.openingHours.Wednesday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Thursday" secondary={convertOpeningHours(burgerPlace.openingHours.Thursday)} />
+                                <ListItemText role="listitem" primary="Thursday" secondary={convertOpeningHours(burgerPlace.openingHours.Thursday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Friday" secondary={convertOpeningHours(burgerPlace.openingHours.Friday)} />
+                                <ListItemText role="listitem" primary="Friday" secondary={convertOpeningHours(burgerPlace.openingHours.Friday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Saturday" secondary={convertOpeningHours(burgerPlace.openingHours.Saturday)} />
+                                <ListItemText role="listitem" primary="Saturday" secondary={convertOpeningHours(burgerPlace.openingHours.Saturday)} />
                             </ListItem>
                             <ListItem disablePadding>
-                                <ListItemText primary="Sunday" secondary={convertOpeningHours(burgerPlace.openingHours.Sunday)} />
+                                <ListItemText role="listitem" primary="Sunday" secondary={convertOpeningHours(burgerPlace.openingHours.Sunday)} />
                             </ListItem>
                         </List>
                     </nav>

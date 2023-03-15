@@ -1,14 +1,17 @@
 import { BurgerPlace } from '@/models/burger-place';
 import { BurgerReview } from '@/models/burger-review';
-import { Accordion, AccordionDetails, AccordionSummary, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Badge, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { CSSProperties, useEffect, useState } from 'react';
 import { API_HOST } from '@/constants';
+import { BurgerReviewImageResponse } from '@/models/burger-review-image-response';
 
 type Props = {
     burgerPlace: BurgerPlace;
+    newBurgerReviewResponse: BurgerReview;
+    newBurgerReviewImageResponse: BurgerReviewImageResponse;
 }
 
 const reviewListStyle: CSSProperties = {
@@ -18,7 +21,7 @@ const reviewListStyle: CSSProperties = {
     marginTop: '20px',
 }
 
-export default function BurgerReviews({ burgerPlace }: Props) {
+export default function BurgerReviews({ burgerPlace, newBurgerReviewResponse, newBurgerReviewImageResponse }: Props) {
     const [burgerReviews, setBurgerReviews] = useState<BurgerReview[]>([]);
 
     useEffect(() => {
@@ -32,9 +35,9 @@ export default function BurgerReviews({ burgerPlace }: Props) {
             fetchBurgerReviews();
         }
 
-    }, [burgerPlace]);
+    }, [burgerPlace, newBurgerReviewImageResponse]);
 
-    const calculateOverallRating = (burgerReview: BurgerReview)=>{
+    const calculateOverallRating = (burgerReview: BurgerReview) => {
         const ratingSum = burgerReview.tasteRating + burgerReview.textureRating + burgerReview.visualRating;
 
         return ratingSum / 3;
@@ -42,19 +45,21 @@ export default function BurgerReviews({ burgerPlace }: Props) {
 
     return (
         <>
-            <Accordion sx={{alignSelf: 'stretch'}}>
+            <Accordion sx={{ alignSelf: 'stretch' }}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header">
-                    <Typography>Burger Reviews</Typography>
+                    <Badge badgeContent={burgerReviews.length} color="info">
+                        <Typography>Burger Reviews</Typography>
+                    </Badge>
                 </AccordionSummary>
                 <AccordionDetails>
                     {burgerReviews.map(burgerReview =>
                         <div key={burgerReview.id} style={reviewListStyle}>
-                            
-                            <img src={burgerReview.pictureUrl} width="100" height="100"></img>
-                            
+
+                            <img src={burgerReview.pictureUrl} width="100" height="100" key={burgerReview.pictureUrl}></img>
+
                             <Typography component="legend">Overall</Typography>
                             <Rating name="read-only" value={calculateOverallRating(burgerReview)} readOnly />
 
@@ -68,7 +73,7 @@ export default function BurgerReviews({ burgerPlace }: Props) {
                             <Rating name="read-only" value={burgerReview.visualRating} readOnly />
 
                             <Typography component="legend">Comment</Typography>
-                            <TextField disabled={true} fullWidth={true} value={burgerReview.comment} id="outlined-controlled" variant="outlined"/>
+                            <TextField disabled={true} fullWidth={true} value={burgerReview.comment} id="outlined-controlled" variant="outlined" />
 
                         </div>
                     )}
