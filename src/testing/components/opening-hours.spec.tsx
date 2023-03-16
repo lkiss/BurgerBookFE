@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import OpeningHours from '../../components/opening-hours/opening-hours';
 import { BurgerPlace } from '@/models/burger-place';
 import { Address } from '@/models/address';
@@ -58,7 +58,7 @@ describe("OpeningHours specs", () => {
                 const mondayElements = screen.getAllByRole("listitem");
                 const expected = mondayElements[0].textContent;
 
-                expect(expected).toBe("Monday9:00:00 AM - 5:00:00 PM");
+                expect(expected).toBe("Monday9:00:00 AM - 5:00:00 PM");
             });
         })
     })

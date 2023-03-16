@@ -11,5 +11,14 @@ yarn dev
 # or
 pnpm dev
 ```
+## For development
+```node
+npx next
+```
 
-For development use npx next.
+## For test
+```node
+npx jest 
+# or
+npm run test
+```
