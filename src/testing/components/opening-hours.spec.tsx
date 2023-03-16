@@ -48,21 +48,17 @@ describe("OpeningHours specs", () => {
 
     describe("given openinghours data from api", () => {
         describe("when data is received in correct format", () => {
-            it('should render Monday list item with Monday primary attribute', () => {
-                render(<OpeningHours burgerPlace={burgerPlace}/>);
+            it('should render Monday list item with Monday and time text', () => {
+                render(<OpeningHours burgerPlace={burgerPlace} />);
+                
+                const button = screen.getByRole("button");
 
-                const mondayElement = screen.getByRole("listitem");
-                const expected = mondayElement.getAttribute("primary");
+                fireEvent.click(button);
 
-                expect(expected).toBe("Monday");
-            });
+                const mondayElements = screen.getAllByRole("listitem");
+                const expected = mondayElements[0].textContent;
 
-            xit('should render Monday list item with opening hours in start - end format as secondary attribute', () => {
-                const { getByRole } = render(<OpeningHours burgerPlace={burgerPlace} />);
-                const mondayElement = getByRole("listitem");
-                const expected = mondayElement.getAttribute("secondary");
-
-                expect(expected).toBe("08:00:00 - 16:00:00.00");
+                expect(expected).toBe("Monday9:00:00 AM - 5:00:00 PM");
             });
         })
     })
